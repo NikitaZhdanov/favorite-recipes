@@ -1,0 +1,76 @@
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.1.xsd">
+
+    <changeSet id="set_tag" author="zhdanov">
+        <tagDatabase tag="1.0.0"/>
+    </changeSet>
+
+    <changeSet id="create_recipes_table" author="zhdanov">
+        <createTable tableName="recipes">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)"/>
+            <column name="instructions" type="clob"/>
+            <column name="vegetarian" type="boolean"/>
+        </createTable>
+        <createIndex tableName="recipes" indexName="i_recipes_name">
+            <column name="name"/>
+        </createIndex>
+
+        <rollback>
+            <dropTable tableName="recipes"/>
+            <dropIndex tableName="recipes" indexName="i_recipes_name"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="createInstructionsIndex" author="zhdanov">
+        <createIndex tableName="recipes" indexName="i_recipes_instructions">
+            <column name="instructions"/>
+        </createIndex>
+
+        <rollback>
+            <dropIndex tableName="recipes" indexName="i_recipes_instructions"/>
+        </rollback>
+
+        <modifySql>
+            <replace replace="INDEX" with="FULLTEXT INDEX"/>
+        </modifySql>
+    </changeSet>
+
+    <changeSet id="create_ingredients_table" author="zhdanov">
+        <createTable tableName="ingredients">
+            <column name="id" type="varchar(36)">
+                <constraints primaryKey="true"/>
+            </column>
+            <column name="name" type="varchar(255)"/>
+            <column name="amount" type="int"/>
+        </createTable>
+
+        <createIndex tableName="ingredients" indexName="i_ingredients_name">
+            <column name="name"/>
+        </createIndex>
+
+        <rollback>
+            <dropTable tableName="ingredients"/>
+        </rollback>
+    </changeSet>
+
+    <changeSet id="create_recipes_ingredients_table" author="zhdanov">
+        <createTable tableName="recipes_ingredients">
+            <column name="recipe_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_recipes_link_id" references="recipes(id)"/>
+            </column>
+            <column name="ingredients_id" type="varchar(36)">
+                <constraints nullable="false" foreignKeyName="fk_ingredients_link_id" references="ingredients(id)"/>
+            </column>
+        </createTable>
+
+        <rollback>
+            <dropTable tableName="recipes_ingredients"/>
+        </rollback>
+    </changeSet>
+
+</databaseChangeLog>

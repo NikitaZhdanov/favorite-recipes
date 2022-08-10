@@ -1,0 +1,38 @@
+spring:
+  datasource:
+    # URL of the database
+    url: jdbc:mariadb://localhost:3306/recipes
+    # Username of the database
+    username: recipes
+    # Password of the database
+    password: recipes
+    # Database platform (should not be changed)
+    platform: mariadb
+    hikari:
+      # Database connection timeout in milliseconds
+      connectionTimeout: 5000
+      # Database maximum pool size
+      maximumPoolSize: 10
+  jpa:
+    hibernate:
+      # Database naming strategy (should not be changed)
+      namingStrategy: org.hibernate.cfg.EJB3NamingStrategy
+      # Auto data definition language (should not be changed)
+      ddlAuto: none
+    # Open in view mode (should not be changed)
+    open-in-view: false
+    # New generator mapping strategy (should not be changed)
+    properties.hibernate.id.newGeneratorMappings: false
+    # Database type (should not be changed)
+    database: MYSQL
+  mvc:
+    pathmatch:
+      # Enable pathmatch for swagger UI (should not be changed)
+      matching-strategy: ant_path_matcher
+
+server:
+  error:
+    # Include messages in error responses (can be set to false for security reasons)
+    include-message: always
+  # Service port on which the service is exposed
+  port: 8080
