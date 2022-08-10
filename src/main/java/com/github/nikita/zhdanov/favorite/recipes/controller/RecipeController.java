@@ -1,5 +1,6 @@
 package com.github.nikita.zhdanov.favorite.recipes.controller;
 
+import com.github.nikita.zhdanov.favorite.recipes.error.RecipeNotExists;
 import com.github.nikita.zhdanov.favorite.recipes.model.Recipe;
 import com.github.nikita.zhdanov.favorite.recipes.service.RecipeService;
 import io.swagger.annotations.ApiOperation;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import javax.validation.constraints.NotBlank;
 
 @RestController
 @RequestMapping("recipe")
@@ -21,9 +23,9 @@ public class RecipeController {
     @PutMapping(value = "/{id}")
     @ApiOperation("Add new or update existing recipe.")
     @ApiResponses({
-            @ApiResponse(code = 200, message = "Recipe saved."),
-            @ApiResponse(code = 500, message = "Internal server error."),
-            @ApiResponse(code = 400, message = "Invalid request body provided.")
+            @ApiResponse(code = 204, message = "Recipe saved."),
+            @ApiResponse(code = 400, message = "Invalid request body provided."),
+            @ApiResponse(code = 500, message = "Internal server error.")
     })
     public ResponseEntity<?> put(
             @ApiParam(
@@ -34,6 +36,28 @@ public class RecipeController {
     ) {
         recipe.setId(id);
         recipeService.save(recipe);
-        return ResponseEntity.ok().build();
+        return ResponseEntity.status(204).build();
+    }
+
+    @DeleteMapping(value = "/{id}")
+    @ApiOperation("Delete existing recipe by id.")
+    @ApiResponses({
+            @ApiResponse(code = 204, message = "Recipe removed."),
+            @ApiResponse(code = 400, message = "Invalid request body provided."),
+            @ApiResponse(code = 404, message = "Recipe not found."),
+            @ApiResponse(code = 500, message = "Internal server error.")
+    })
+    public ResponseEntity<?> delete(
+            @ApiParam(
+                    value = "id of the recipe to remove.",
+                    example = "12345678-1234-1234-1234-1234567890ab"
+            ) @NotBlank @PathVariable("id") String id
+    ) {
+        try {
+            recipeService.delete(id);
+            return ResponseEntity.status(204).build();
+        } catch (RecipeNotExists e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
     }
 }

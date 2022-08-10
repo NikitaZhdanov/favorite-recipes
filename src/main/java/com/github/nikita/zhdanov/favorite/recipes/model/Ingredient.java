@@ -9,8 +9,10 @@ import lombok.NoArgsConstructor;
 
 import javax.persistence.Entity;
 import javax.persistence.Id;
+import javax.persistence.PrePersist;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 import java.util.UUID;
 
 @JsonInclude(JsonInclude.Include.NON_NULL)
@@ -23,12 +25,20 @@ import java.util.UUID;
 public class Ingredient {
     @Id
     @ApiParam(value = "Unique identifier of the ingredient", example = "12345678-1234-1234-1234-1234567890ab")
-    private String id = UUID.randomUUID().toString();
+    private String id;
 
     @NotBlank(message = "Name is required")
+    @Size(min = 1, max = 255, message = "Name must be between 1 and 255 characters")
     @ApiParam(value = "Name of the ingredient", example = "Tomatoes")
     private String name;
 
     @ApiParam(value = "Amount of the ingredient in grams", example = "100")
     private int amount;
+
+    @PrePersist
+    private void ensureId(){
+        if (id == null){
+            id = UUID.randomUUID().toString();
+        }
+    }
 }

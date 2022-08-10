@@ -11,6 +11,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 import java.util.Collection;
 import java.util.UUID;
 
@@ -25,9 +26,10 @@ import java.util.UUID;
 public class Recipe {
     @Id
     @ApiModelProperty(value = "Unique identifier of the recipe", example = "12345678-1234-1234-1234-1234567890ab")
-    private String id = UUID.randomUUID().toString();
+    private String id;
 
     @NotBlank(message = "Name is required")
+    @Size(min = 1, max = 255, message = "Name must be between 1 and 255 characters")
     @ApiModelProperty(value = "Name of the recipe", example = "Pizza margarita")
     private String name;
 
@@ -44,4 +46,11 @@ public class Recipe {
 
     @ApiModelProperty(value = "Is the dish vegetarian?", example = "true")
     private boolean vegetarian;
+
+    @PrePersist
+    private void ensureId(){
+        if (id == null){
+            id = UUID.randomUUID().toString();
+        }
+    }
 }
