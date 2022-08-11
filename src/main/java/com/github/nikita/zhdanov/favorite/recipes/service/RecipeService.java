@@ -23,4 +23,8 @@ public class RecipeService {
             throw new RecipeNotExists(id);
         }
     }
+
+    public Recipe get(String id) {
+        return recipeRepository.findById(id).orElseThrow(() -> new RecipeNotExists(id));
+    }
 }

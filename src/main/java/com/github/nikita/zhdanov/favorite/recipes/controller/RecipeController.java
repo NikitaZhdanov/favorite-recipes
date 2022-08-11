@@ -60,4 +60,26 @@ public class RecipeController {
             return ResponseEntity.status(404).body(e.getMessage());
         }
     }
+
+    @GetMapping(value = "/{id}")
+    @ApiOperation("Get recipe by id.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Recipe found.", response = Recipe.class),
+            @ApiResponse(code = 400, message = "Invalid request."),
+            @ApiResponse(code = 404, message = "Recipe not found."),
+            @ApiResponse(code = 500, message = "Internal server error.")
+    })
+    public ResponseEntity<?> get(
+            @ApiParam(
+                    value = "id of the recipe to remove.",
+                    example = "12345678-1234-1234-1234-1234567890ab"
+            ) @NotBlank @PathVariable("id") String id
+    ) {
+        try {
+            var recipe = recipeService.get(id);
+            return ResponseEntity.ok(recipe);
+        } catch (RecipeNotExists e) {
+            return ResponseEntity.status(404).body(e.getMessage());
+        }
+    }
 }

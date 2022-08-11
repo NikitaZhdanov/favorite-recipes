@@ -38,7 +38,7 @@ public class Recipe {
             example = "1. Put the pizza in the oven\n2. Put the pizza in the oven\n3. Put the pizza in the oven")
     private String instructions;
 
-    @ManyToMany(cascade = CascadeType.ALL)
+    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @NotEmpty(message = "Ingredients are required")
     @ApiModelProperty(value = "Ingredients for the recipe",
             example = "[{\"name\":\"Tomatoes\",\"amount\":100},{\"name\":\"Mozzarella\",\"amount\":100}]")

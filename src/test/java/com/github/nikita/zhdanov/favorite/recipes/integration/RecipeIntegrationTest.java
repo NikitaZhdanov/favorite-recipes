@@ -16,8 +16,6 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -48,7 +46,6 @@ public class RecipeIntegrationTest {
     }
 
     @Test
-    @Transactional(isolation = Isolation.READ_COMMITTED)
     public void should_successfully_add_recipe() {
         // given
         var recipeId = UUID.randomUUID().toString();
@@ -180,7 +177,7 @@ public class RecipeIntegrationTest {
                 .name("Salad with tomato, cucumber and onion")
                 .ingredients(List.of(
                         Ingredient.builder().name("Tomato").amount(500).build(),
-                        Ingredient.builder().name("Cucomber").amount(500).build(),
+                        Ingredient.builder().name("Cucumber").amount(500).build(),
                         Ingredient.builder().name("Onion").amount(100).build()
                 ))
                 .instructions("Cut the tomato, cucumber and onion into small pieces.\nMix the ingredients together in a bowl.\nAdd some salt.")
@@ -211,7 +208,7 @@ public class RecipeIntegrationTest {
                 .name("Salad with tomato, cucumber and onion")
                 .ingredients(List.of(
                         Ingredient.builder().name("Tomato").amount(500).build(),
-                        Ingredient.builder().name("Cucomber").amount(500).build(),
+                        Ingredient.builder().name("Cucumber").amount(500).build(),
                         Ingredient.builder().name("Onion").amount(100).build()
                 ))
                 .instructions("Cut the tomato, cucumber and onion into small pieces.\nMix the ingredients together in a bowl.\nAdd some salt.")
@@ -230,13 +227,13 @@ public class RecipeIntegrationTest {
     }
 
     @Test
-    public void should_return_404_for_non_existing_recipe_id() {
+    public void should_return_404_when_deleting_by_non_existing_recipe_id() {
         // given
         var recipe = Recipe.builder()
                 .name("Salad with tomato, cucumber and onion")
                 .ingredients(List.of(
                         Ingredient.builder().name("Tomato").amount(500).build(),
-                        Ingredient.builder().name("Cucomber").amount(500).build(),
+                        Ingredient.builder().name("Cucumber").amount(500).build(),
                         Ingredient.builder().name("Onion").amount(100).build()
                 ))
                 .instructions("Cut the tomato, cucumber and onion into small pieces.\nMix the ingredients together in a bowl.\nAdd some salt.")
@@ -247,6 +244,52 @@ public class RecipeIntegrationTest {
         // when
         try {
             restTemplate.delete(URI.create("http://localhost:" + localServerPort + "/recipe/non-existing-id"));
+        } catch (HttpClientErrorException.NotFound e) {
+            // then
+            return;
+        }
+        throw new AssertionError("Expected BadRequest exception");
+    }
+
+    @Test
+    public void should_successfully_get_recipe_by_id() {
+        // given
+        var recipe = Recipe.builder()
+                .name("Salad with tomato, cucumber and onion")
+                .ingredients(List.of(
+                        Ingredient.builder().name("Tomato").amount(500).build(),
+                        Ingredient.builder().name("Cucumber").amount(500).build(),
+                        Ingredient.builder().name("Onion").amount(100).build()
+                ))
+                .instructions("Cut the tomato, cucumber and onion into small pieces.\nMix the ingredients together in a bowl.\nAdd some salt.")
+                .vegetarian(true)
+                .build();
+        recipeRepository.save(recipe);
+
+        // when
+        var retrievedRecipe = restTemplate.getForObject(URI.create("http://localhost:" + localServerPort + "/recipe/" + recipe.getId()), Recipe.class);
+
+        assertThat(retrievedRecipe).isEqualTo(recipe);
+    }
+
+    @Test
+    public void should_return_404_when_getting_by_non_existing_recipe_id() {
+        // given
+        var recipe = Recipe.builder()
+                .name("Salad with tomato, cucumber and onion")
+                .ingredients(List.of(
+                        Ingredient.builder().name("Tomato").amount(500).build(),
+                        Ingredient.builder().name("Cucumber").amount(500).build(),
+                        Ingredient.builder().name("Onion").amount(100).build()
+                ))
+                .instructions("Cut the tomato, cucumber and onion into small pieces.\nMix the ingredients together in a bowl.\nAdd some salt.")
+                .vegetarian(true)
+                .build();
+        recipeRepository.save(recipe);
+
+        // when
+        try {
+            restTemplate.getForObject(URI.create("http://localhost:" + localServerPort + "/recipe/non-existing-id"), Recipe.class);
         } catch (HttpClientErrorException.NotFound e) {
             // then
             return;
