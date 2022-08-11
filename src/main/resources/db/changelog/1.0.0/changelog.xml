@@ -16,13 +16,8 @@
             <column name="instructions" type="clob"/>
             <column name="vegetarian" type="boolean"/>
         </createTable>
-        <createIndex tableName="recipes" indexName="i_recipes_name">
-            <column name="name"/>
-        </createIndex>
-
         <rollback>
             <dropTable tableName="recipes"/>
-            <dropIndex tableName="recipes" indexName="i_recipes_name"/>
         </rollback>
     </changeSet>
 
@@ -30,9 +25,13 @@
         <createIndex tableName="recipes" indexName="i_recipes_instructions">
             <column name="instructions"/>
         </createIndex>
+        <createIndex tableName="recipes" indexName="i_recipes_name">
+            <column name="name"/>
+        </createIndex>
 
         <rollback>
             <dropIndex tableName="recipes" indexName="i_recipes_instructions"/>
+            <dropIndex tableName="recipes" indexName="i_recipes_name"/>
         </rollback>
 
         <modifySql>

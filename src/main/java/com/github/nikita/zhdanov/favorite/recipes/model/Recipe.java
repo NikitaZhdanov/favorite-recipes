@@ -30,17 +30,18 @@ public class Recipe {
 
     @NotBlank(message = "Name is required")
     @Size(min = 1, max = 255, message = "Name must be between 1 and 255 characters")
-    @ApiModelProperty(value = "Name of the recipe", example = "Pizza margarita")
+    @ApiModelProperty(value = "Name of the recipe", example = "Pizza margarita", required = true)
     private String name;
 
     @NotBlank(message = "Instructions are required")
     @ApiModelProperty(value = "Instructions for the recipe",
-            example = "1. Put the pizza in the oven\n2. Put the pizza in the oven\n3. Put the pizza in the oven")
+            example = "1. Put the pizza in the oven\n2. Put the pizza in the oven\n3. Put the pizza in the oven",
+            required = true)
     private String instructions;
 
-    @ManyToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
+    @OneToMany(cascade = CascadeType.ALL, fetch = FetchType.EAGER)
     @NotEmpty(message = "Ingredients are required")
-    @ApiModelProperty(value = "Ingredients for the recipe",
+    @ApiModelProperty(value = "Ingredients for the recipe", required = true,
             example = "[{\"name\":\"Tomatoes\",\"amount\":100},{\"name\":\"Mozzarella\",\"amount\":100}]")
     private Collection<Ingredient> ingredients;
 

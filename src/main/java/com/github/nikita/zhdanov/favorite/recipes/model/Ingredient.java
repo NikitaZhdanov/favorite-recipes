@@ -29,7 +29,7 @@ public class Ingredient {
 
     @NotBlank(message = "Name is required")
     @Size(min = 1, max = 255, message = "Name must be between 1 and 255 characters")
-    @ApiParam(value = "Name of the ingredient", example = "Tomatoes")
+    @ApiParam(value = "Name of the ingredient", example = "Tomatoes", required = true)
     private String name;
 
     @ApiParam(value = "Amount of the ingredient in grams", example = "100")

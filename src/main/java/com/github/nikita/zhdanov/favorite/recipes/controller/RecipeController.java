@@ -2,6 +2,8 @@ package com.github.nikita.zhdanov.favorite.recipes.controller;
 
 import com.github.nikita.zhdanov.favorite.recipes.error.RecipeNotExists;
 import com.github.nikita.zhdanov.favorite.recipes.model.Recipe;
+import com.github.nikita.zhdanov.favorite.recipes.model.RecipeFilters;
+import com.github.nikita.zhdanov.favorite.recipes.model.RecipeSearchResponse;
 import com.github.nikita.zhdanov.favorite.recipes.service.RecipeService;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiParam;
@@ -81,5 +83,30 @@ public class RecipeController {
         } catch (RecipeNotExists e) {
             return ResponseEntity.status(404).body(e.getMessage());
         }
+    }
+
+    @PostMapping(value = "/search")
+    @ApiOperation("Get all recipes or search using filters.")
+    @ApiResponses({
+            @ApiResponse(code = 200, message = "Search request proceed successfully.", response = Recipe.class),
+            @ApiResponse(code = 400, message = "Invalid request."),
+            @ApiResponse(code = 500, message = "Internal server error.")
+    })
+    public ResponseEntity<?> search(@Valid @RequestBody(required = false) RecipeFilters filters) {
+        if (filters == null) {
+            filters = new RecipeFilters();
+        }
+        filters.setPageSize(filters.getPageSize() == null ? 100 : filters.getPageSize());
+
+        var recipes = recipeService.search(filters);
+
+        var recipeSearchResponse = RecipeSearchResponse.builder()
+                .recipes(recipes)
+                .pageSize(filters.getPageSize())
+                .pageNumber(filters.getPageNumber())
+                .currentNumberOfRecipes(recipes.size())
+                .build();
+
+        return ResponseEntity.ok(recipeSearchResponse);
     }
 }
